@@ -1,0 +1,25 @@
+name: CI workflow for homework
+
+on:
+  [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [g++, clang]
+    steps:
+      - name: checking out repository
+        uses: actions/checkout@v4
+
+      - name: preparing build
+        run:  cmake -H. -B_build -D CMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: building
+        run:  cmake --build _build
+      - name: checking programs output
+        run:  echo "1 -5  6" | _build/solver_application/solver_app
+
+      - name: status info
+        run: echo ${{ job.status }} is status of job
+
