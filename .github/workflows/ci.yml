@@ -45,7 +45,9 @@ jobs:
       - name: building
         run:  cmake --build _build
       - name: checking programs output
-        run:  echo "1 -5  6" | _build\solver_application\Debug\solver_app
+        run:  |
+          echo "1 -5  6" | _build\solver_application\Debug\solver_app 
+          _build\hello_world_application\Debug\hello
 
       - name: status info
         run: echo ${{ job.status }} is status of job
