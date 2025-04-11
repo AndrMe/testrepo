@@ -7,7 +7,9 @@ project(hello)
 
 add_executable(hello hello_world.cpp)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../formatter_ex_lib ${CMAKE_BINARY_DIR}/formatter_ex_lib)
+if (NOT TARGET formatter_ex)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../formatter_ex_lib ${CMAKE_BINARY_DIR}/formatter_ex_lib)
+endif()
 
 target_include_directories(hello PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../formatter_ex_lib)
 
