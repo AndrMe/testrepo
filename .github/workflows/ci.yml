@@ -9,14 +9,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cpp_compiler: [g++, clang++]
-        c_compiler: [gcc, clang]
+        include:
+          - cpp_comp: g++
+            c_comp: gcc
+          - cpp_comp: clang++
+            c_comp: clang
+
     steps:
       - name: checking out repository
         uses: actions/checkout@v4
 
       - name: preparing build
-        run:  cmake -H. -B_build -D CMAKE_CXX_COMPILER=${{matrix.cpp_compiler}} -D CMAKE_C_COMPILER=${{matrix.c_compiler}} 
+        run:  cmake -H. -B_build -D CMAKE_CXX_COMPILER=${{matrix.cpp_comp}} -D CMAKE_C_COMPILER=${{matrix.c_comp}} 
       - name: building
         run:  cmake --build _build
       - name: checking programs output
