@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows10, windows11]
+        os: [windows-10, windows-11]
 
     steps:
       - name: checking out repository
