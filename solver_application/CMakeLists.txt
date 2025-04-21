@@ -7,7 +7,6 @@ project(solver_app)
 
 add_executable(solver_app equation.cpp)
 
-set(f_ex_path ${CMAKE_CURRENT_SOURCE_DIR}/../formatter_ex_lib)
 set(s_lib_path ${CMAKE_CURRENT_SOURCE_DIR}/../solver_lib)
 
 
@@ -21,6 +20,6 @@ if (NOT TARGET solver_lib)
 endif()
 
 
-target_include_directories(solver_app PUBLIC ${f_ex_path} ${s_lib_path})
+target_include_directories(solver_app PUBLIC ${s_lib_path})
 
 target_link_libraries(solver_app formatter_ex solver)
