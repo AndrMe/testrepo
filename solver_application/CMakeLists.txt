@@ -20,21 +20,4 @@ if (NOT TARGET solver_lib)
     add_subdirectory(${s_lib_path} solver_lib)
 endif()
 
-
-#target_include_directories(solver_app PUBLIC ${s_lib_path})
-
-
 target_link_libraries(solver_app formatter_ex solver)
-
-install(TARGETS formatter_ex
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    PUBLIC_HEADER DESTINATION include
-)
-install(TARGETS solver
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    PUBLIC_HEADER DESTINATION include
-)
