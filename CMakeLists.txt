@@ -14,4 +14,31 @@ set(PRINT_VERSION_STRING "v${PRINT_VERSION}")
 add_subdirectory(solver_application)
 add_subdirectory(hello_world_application)
 
+# file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+# message("HEADERS" ${HEADERS})
+# install(FILES ${HEADERS} DESTINATION include)
+
+# message("HEADERS" ${HEADERS})
+
+
+install(TARGETS solver_app
+    RUNTIME DESTINATION bin
+)
+
+# install(TARGETS formatter_ex
+#     ARCHIVE DESTINATION lib
+#     LIBRARY DESTINATION lib
+#     RUNTIME DESTINATION bin
+#     PUBLIC_HEADER DESTINATION include
+# )
+
+
+# install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION include)
+
+# install(EXPORT solver-config DESTINATION cmake)
+# install(EXPORT formatter-config DESTINATION cmake)
+# install(EXPORT formatter_ex-config DESTINATION cmake)
+
+#install(EXPORT print-config DESTINATION cmake)
+
 include(CPackConfig.cmake)

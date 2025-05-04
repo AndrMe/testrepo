@@ -12,6 +12,7 @@ set(s_lib_path ${CMAKE_CURRENT_SOURCE_DIR}/../solver_lib)
 
 if (NOT TARGET formatter_ex)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../formatter_ex_lib ${CMAKE_BINARY_DIR}/formatter_ex_lib)
+    
 endif()
 
 
@@ -20,6 +21,20 @@ if (NOT TARGET solver_lib)
 endif()
 
 
-target_include_directories(solver_app PUBLIC ${s_lib_path})
+#target_include_directories(solver_app PUBLIC ${s_lib_path})
+
 
 target_link_libraries(solver_app formatter_ex solver)
+
+install(TARGETS formatter_ex
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    PUBLIC_HEADER DESTINATION include
+)
+install(TARGETS solver
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    PUBLIC_HEADER DESTINATION include
+)
