@@ -162,6 +162,8 @@ jobs:
           cd _build/
           mkdir _artifacts
           cpack -G "NSIS"
+          cpack -G "WIX"
+          move "*.exe"  "_artifacts\"
           move "*.msi"  "_artifacts\"
       #just testing
       - name: Upload build artifacts
