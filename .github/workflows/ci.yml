@@ -126,44 +126,40 @@ jobs:
           path: _build/_artifacts/
           retention-days: 1
 
-  # Create_msi:
-  #   name: Create_msi
-  #   needs: [build_on_linux, build_on_windows, build_on_mac]
-  #   if: startsWith(github.ref, 'refs/tags/v')
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true  
-  #   steps:
-  #     - name: checking out repository
-  #       uses: actions/checkout@v4
+  Create_msi:
+    name: Create_msi
+    needs: [build_on_linux, build_on_windows, build_on_mac]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true  
+    steps:
+      - name: checking out repository
+        uses: actions/checkout@v4
         
-  #     - name: install dependencies
-  #       run: sudo apt-get install rpm
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: _buildgcc
-  #         path: _build/ 
-  #     - name: test
-  #       run: echo ${{github.ref}}
-  #     - name: create source files
-  #       run: |
-  #         cd _build/ 
-  #         cpack --config CPackSourceConfig.cmake
-  #         mkdir _artifacts
-  #         mv *.tar.gz _artifacts
-  #         mv *.zip _artifacts
-  #         cpack -G "DEB"
-  #         cpack -G "RPM"
-  #         mv *.deb _artifacts
-  #         mv *.rpm _artifacts
-  #     #just testing
-  #     - name: Upload build artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: linux files
-  #         path: _build/_artifacts/
-  #         retention-days: 1
+      - name: install dependencies
+        run: sudo apt-get install rpm
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: _buildmac
+          path: _build/ 
+      - name: test
+        run: echo ${{github.ref}}
+      - name: create source files
+        run: |
+          cd _build/ 
+          cpack --config CPackSourceConfig.cmake
+          mkdir _artifacts
+          cpack -G "DragNDrop"
+          mv *.dmg _artifacts
+      #just testing
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac files
+          path: _build/_artifacts/
+          retention-days: 1
 
 
   # Create_deb_rpm:
