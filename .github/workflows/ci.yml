@@ -147,7 +147,7 @@ jobs:
           path: _build/_artifacts/
           retention-days: 1
 
-reate_msi:
+  Create_msi:
     name: Create_msi
     needs: [build_on_linux, build_on_mac, build_on_windows]
     if: startsWith(github.ref, 'refs/tags/v')
