@@ -64,9 +64,32 @@ jobs:
   #     - name: status info
   #       run: echo ${{ job.status }} is status of job
   
+  build_on_mac:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: checking out repository
+        uses: actions/checkout@v4
+
+      - name: preparing build
+        run:  cmake -H. -B_build
+      - name: building
+        run:  cmake --build _build
+  
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: _buildmac
+          path: _build/  
+          retention-days: 1
+
+
+
+  
   Create_sources_deb_rpm:
-    name: Create_sources
-    needs: [build_on_linux] #, build_on_windows]
+    name: Create sources&deb&rpm
+    needs: [build_on_linux, build_on_windows, build_on_mac]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     strategy:
@@ -99,9 +122,49 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: source files
+          name: linux files
           path: _build/_artifacts/
           retention-days: 1
+
+  # Create_msi:
+  #   name: Create_msi
+  #   needs: [build_on_linux, build_on_windows, build_on_mac]
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true  
+  #   steps:
+  #     - name: checking out repository
+  #       uses: actions/checkout@v4
+        
+  #     - name: install dependencies
+  #       run: sudo apt-get install rpm
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: _buildgcc
+  #         path: _build/ 
+  #     - name: test
+  #       run: echo ${{github.ref}}
+  #     - name: create source files
+  #       run: |
+  #         cd _build/ 
+  #         cpack --config CPackSourceConfig.cmake
+  #         mkdir _artifacts
+  #         mv *.tar.gz _artifacts
+  #         mv *.zip _artifacts
+  #         cpack -G "DEB"
+  #         cpack -G "RPM"
+  #         mv *.deb _artifacts
+  #         mv *.rpm _artifacts
+  #     #just testing
+  #     - name: Upload build artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: linux files
+  #         path: _build/_artifacts/
+  #         retention-days: 1
+
 
   # Create_deb_rpm:
   #   name: Create_sources
