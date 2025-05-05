@@ -35,64 +35,103 @@ jobs:
           name: _build${{matrix.c_comp}}
           path: _build/  
           retention-days: 1
-  # build_on_windows:
-  #   runs-on: ${{matrix.os}}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [windows-latest]
+  build_on_windows:
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
 
-  #   steps:
-  #     - name: checking out repository
-  #       uses: actions/checkout@v4
+    steps:
+      - name: checking out repository
+        uses: actions/checkout@v4
 
-  #     - name: preparing build
-  #       run:  cmake . -B_build 
-  #     - name: building
-  #       run:  cmake --build _build
-  #     - name: checking programs output
-  #       run:  |
-  #         echo "1 -5  6" | _build\solver_application\Debug\solver_app 
-  #         _build\hello_world_application\Debug\hello
-  #     - name: Upload build artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: windows_build
-  #         path: _build/    
-  #         retention-days: 1
+      - name: preparing build
+        run:  cmake . -B_build 
+      - name: building
+        run:  cmake --build _build
+      - name: checking programs output
+        run:  |
+          echo "1 -5  6" | _build\solver_application\Debug\solver_app 
+          _build\hello_world_application\Debug\hello
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_build
+          path: _build/    
+          retention-days: 1
 
-  #     - name: status info
-  #       run: echo ${{ job.status }} is status of job
+      - name: status info
+        run: echo ${{ job.status }} is status of job
   
-  Create_sources:
+  Create_sources_deb_rpm:
     name: Create_sources
-    needs: [build_on_linux] #, build_on_windows]
+    needs: [build_on_linux, build_on_windows]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true  
     steps:
-      - name: checking out repository and submodules
+      - name: checking out repository
         uses: actions/checkout@v4
         
+      - name: install dependencies
+        run: apt-get install rpm
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: _buildgcc
-          path: _buildgcc/
+          path: _build/ 
       - name: test
         run: echo ${{github.ref}}
       - name: create source files
         run: |
-          cd _buildgcc
+          cd _build/ 
           cpack --config CPackSourceConfig.cmake
           mkdir _artifacts
           mv *.tar.gz _artifacts
           mv *.zip _artifacts
+          cpack -G "DEB"
+          cpack -G "RPM"
+          mv *.deb _artifacts
+          mv *.rpm _artifacts
       #just testing
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: source files
-          path: _buildgcc/_artifacts/
+          path: _build/_artifacts/
           retention-days: 1
+
+  # Create_deb_rpm:
+  #   name: Create_sources
+  #   needs: [build_on_linux, build_on_windows]
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true  
+  #   steps:
+  #     - name: checking out repository and submodules
+  #       uses: actions/checkout@v4
+        
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: _buildgcc
+  #         path: _build/ 
+  #     - name: test
+  #       run: echo ${{github.ref}}
+  #     - name: create source files
+  #       run: |
+  #         cd _build/ 
+  #         cpack --config CPackSourceConfig.cmake
+  #         mkdir _artifacts
+  #         mv *.tar.gz _artifacts
+  #         mv *.zip _artifacts
+  #     #just testing
+  #     - name: Upload build artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: source files
+  #         path: _build/_artifacts/
+  #         retention-days: 1
