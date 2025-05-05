@@ -89,7 +89,7 @@ jobs:
   
   Create_sources_deb_rpm:
     name: Create sources&deb&rpm
-    needs: [build_on_linux, build_on_windows, build_on_mac]
+    needs: [build_on_linux, build_on_mac]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     strategy:
