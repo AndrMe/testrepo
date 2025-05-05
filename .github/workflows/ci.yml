@@ -35,35 +35,31 @@ jobs:
           name: _build${{matrix.c_comp}}
           path: _build/  
           retention-days: 1
-  # build_on_windows:
-  #   runs-on: ${{matrix.os}}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [windows-latest]
 
-  #   steps:
-  #     - name: checking out repository
-  #       uses: actions/checkout@v4
+  build_on_windows:
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+    steps:
+      - name: checking out repository
+        uses: actions/checkout@v4
 
-  #     - name: preparing build
-  #       run:  cmake . -B_build 
-  #     - name: building
-  #       run:  cmake --build _build
-  #     - name: checking programs output
-  #       run:  |
-  #         echo "1 -5  6" | _build\solver_application\Debug\solver_app 
-  #         _build\hello_world_application\Debug\hello
-  #     - name: Upload build artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: windows_build
-  #         path: _build/    
-  #         retention-days: 1
-
-  #     - name: status info
-  #       run: echo ${{ job.status }} is status of job
-  
+      - name: preparing build
+        run:  cmake . -B_build 
+      - name: building
+        run:  cmake --build _build --config Release
+      - name: checking programs output
+        run:  |
+          echo "1 -5  6" | _build\solver_application\Debug\solver_app 
+          _build\hello_world_application\Debug\hello
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_build
+          path: _build/    
+          retention-days: 1
   build_on_mac:
     runs-on: macos-latest
     strategy:
@@ -89,7 +85,7 @@ jobs:
   
   Create_sources_deb_rpm:
     name: Create sources&deb&rpm
-    needs: [build_on_linux, build_on_mac]
+    needs: [build_on_linux, build_on_mac, build_on_windows]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     strategy:
@@ -105,8 +101,6 @@ jobs:
         with:
           name: _buildgcc
           path: _build/ 
-      - name: test
-        run: echo ${{github.ref}}
       - name: create source files
         run: |
           cd _build/ 
@@ -126,9 +120,9 @@ jobs:
           path: _build/_artifacts/
           retention-days: 1
 
-  Create_msi:
-    name: Create_msi
-    needs: [build_on_linux, build_on_mac]
+  Create_dmg:
+    name: Create_dmg
+    needs: [build_on_linux, build_on_mac, build_on_windows]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: macos-latest 
     steps:
@@ -153,6 +147,33 @@ jobs:
           path: _build/_artifacts/
           retention-days: 1
 
+reate_msi:
+    name: Create_msi
+    needs: [build_on_linux, build_on_mac, build_on_windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest 
+    steps:
+      - name: checking out repository
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows_build
+          path: _build/ 
+      - name: create source files
+        run: |
+          cd _build/
+          mkdir _artifacts
+          cpack -G "NSIS"
+          move "*.msi"  "_artifacts\"
+      #just testing
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac files
+          path: _build/_artifacts/
+          retention-days: 1
 
   # Create_deb_rpm:
   #   name: Create_sources
