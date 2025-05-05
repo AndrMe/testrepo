@@ -22,6 +22,6 @@ set(CPACK_DEBIAN_PACKAGE_PREDEPENDS "cmake >= 3.10")
 set(CPACK_DEBIAN_PACKAGE_RELEASE 1)
 
 set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
-set(CPACK_SOURCE_IGNORE_FILES "/.gitignore;/.github/;/.git/;/.vscode/;/_build*/")
+set(CPACK_SOURCE_IGNORE_FILES "/.gitignore;/.github/;/.git/;/.vscode/;/_build.*/")
 
 include(CPack)
