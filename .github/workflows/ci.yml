@@ -147,7 +147,6 @@ jobs:
       - name: create source files
         run: |
           cd _build/ 
-          cpack --config CPackSourceConfig.cmake
           mkdir _artifacts
           cpack -G "DragNDrop"
           mv *.dmg _artifacts
