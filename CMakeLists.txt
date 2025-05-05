@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(all)
+project(solver-pckg)
 
 set(PRINT_VERSION_MAJOR 0)
 set(PRINT_VERSION_MINOR 1)

@@ -12,8 +12,10 @@ jobs:
         include:
           - cpp_comp: g++
             c_comp: gcc
+            source: true
           - cpp_comp: clang++
             c_comp: clang
+            source: false
 
     steps:
       - name: checking out repository
@@ -27,9 +29,12 @@ jobs:
         run:  |
           echo "1 -5  6" | _build/solver_application/solver_app
           _build/hello_world_application/hello
-      - name: status info
-        run: echo ${{ job.status }} is status of job
-
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: _build${{matrix.c_comp}}
+          path: _build/  
+          retention-days: 1
   build_on_windows:
     runs-on: ${{matrix.os}}
     strategy:
@@ -49,7 +54,45 @@ jobs:
         run:  |
           echo "1 -5  6" | _build\solver_application\Debug\solver_app 
           _build\hello_world_application\Debug\hello
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_build
+          path: _build/    
+          retention-days: 1
 
       - name: status info
         run: echo ${{ job.status }} is status of job
   
+  Create_sources:
+    name: Create_sources
+    needs: [build_on_linux, build_on_windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true  
+    steps:
+      - name: checking out repository and submodules
+        uses: actions/checkout@v4
+        
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: _buildgcc
+          path: _buildgcc/
+      - name: test
+        run: echo ${{github.ref}}
+      - name: create source files
+        run: |
+          cd _buildgcc
+          cpack --config CPackSourceConfig.cmake
+          mkdir _artifacts
+          mv *.tar.gz _artifacts
+          mv *.zip _artifacts
+      #just testing
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: source files
+          path: _buildgcc/_artifacts/
+          retention-days: 1
